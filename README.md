@@ -26,5 +26,8 @@ Simple Express + TypeScript API scaffold for Sales Pad.
 
 ## API
 
+- Endpoints live under `src/api`, grouped by version (e.g. `src/api/v1`).
 - `GET /` – root route describing the service.
 - `GET /api/v1/health` – health probe including uptime and timestamp.
+- `GET /api/v1/lead/:id` – fetch a single lead by numeric id.
+- `POST /api/v1/lead` – create a lead (`name` + at least one of `email` or `phoneNumber`).
