@@ -24,6 +24,12 @@ Simple Express + TypeScript API scaffold for Sales Pad.
 - Configure the connection through `DATABASE_URL` (and optional `DATABASE_POOL_SIZE`).
 - Add or update tables inside `src/db/schema.ts` and run the Drizzle scripts above to generate/apply migrations.
 
+## Background Jobs
+
+- PgBoss is pre-configured in `src/workers/boss.ts` and starts with the HTTP server.
+- Jobs use the same Postgres connection by default; override with `BOSS_DATABASE_URL` if you prefer a dedicated queue database.
+- Import the shared `boss` instance (or `startBoss`) to schedule or process jobs from API routes or standalone worker scripts.
+
 ## API
 
 - Endpoints live under `src/api`, grouped by version (e.g. `src/api/v1`).

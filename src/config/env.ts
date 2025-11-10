@@ -19,11 +19,17 @@ const getNumericEnv = (key: string, fallback?: string): number => {
   return parsed;
 };
 
+const databaseUrl = getEnv('DATABASE_URL');
+const bossConnectionString = process.env.BOSS_DATABASE_URL ?? databaseUrl;
+
 export const config = {
   env: process.env.NODE_ENV ?? 'development',
   port: getNumericEnv('PORT', '4000'),
   database: {
-    url: getEnv('DATABASE_URL'),
+    url: databaseUrl,
     poolSize: getNumericEnv('DATABASE_POOL_SIZE', '10'),
+  },
+  boss: {
+    connectionString: bossConnectionString,
   },
 };
