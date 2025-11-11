@@ -12,8 +12,6 @@ export type SendLeadMessagePayload = {
   body: string;
 };
 
-type JobOrJobs<T> = PgBoss.Job<T> | PgBoss.Job<T>[];
-
 export const registerSendLeadMessageWorker = (boss: PgBoss) => {
   boss.work<SendLeadMessagePayload>(SEND_LEAD_MESSAGE_JOB, async (jobOrJobs) => {
     const jobs = Array.isArray(jobOrJobs) ? jobOrJobs : [jobOrJobs];

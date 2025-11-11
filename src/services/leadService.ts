@@ -65,3 +65,13 @@ export const getLeadById = async (id: number): Promise<Lead | undefined> => {
   const [lead] = await db.select().from(leads).where(eq(leads.id, id)).limit(1);
   return lead;
 };
+
+export const getLeadByEmail = async (email: string): Promise<Lead | undefined> => {
+  const normalizedEmail = email.trim().toLowerCase();
+  const [lead] = await db
+    .select()
+    .from(leads)
+    .where(eq(leads.email, normalizedEmail))
+    .limit(1);
+  return lead;
+};
