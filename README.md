@@ -28,7 +28,7 @@ Simple Express + TypeScript API scaffold for Sales Pad.
 
 - PgBoss is pre-configured in `src/workers/boss.ts` and starts with the HTTP server.
 - Jobs use the same Postgres connection by default; override with `BOSS_DATABASE_URL` if you prefer a dedicated queue database.
-- Import the shared `boss` instance (or `startBoss`) to schedule or process jobs from API routes or standalone worker scripts.
+- Import helpers from `src/jobs` to schedule or process workers (e.g., the lead message sender job).
 
 ## API
 
@@ -37,3 +37,4 @@ Simple Express + TypeScript API scaffold for Sales Pad.
 - `GET /api/v1/health` – health probe including uptime and timestamp.
 - `GET /api/v1/lead/:id` – fetch a single lead by numeric id.
 - `POST /api/v1/lead` – create a lead (`name` + at least one of `email` or `phoneNumber`).
+- `POST /api/v1/send` – enqueue a background job to email a lead (`leadId`, `subject`, `body`).

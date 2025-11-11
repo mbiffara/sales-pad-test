@@ -28,14 +28,19 @@ export type Lead = typeof leads.$inferSelect;
 export type NewLead = typeof leads.$inferInsert;
 
 export const messageSender = pgEnum('message_sender', ['system', 'lead']);
+export const messageChannel = pgEnum('message_channel', ['email']);
+export const messageStatus = pgEnum('message_status', ['created', 'sent']);
 
 export const messages = pgTable('messages', {
   id: serial('id').primaryKey(),
   leadId: integer('lead_id')
     .notNull()
     .references(() => leads.id, { onDelete: 'cascade' }),
+  subject: varchar('subject', { length: 255 }).notNull(),
   body: text('body').notNull(),
-  sentBy: messageSender('sent_by').notNull(),
+  channel: messageChannel('channel').default('email').notNull(),
+  status: messageStatus('status').default('created').notNull(),
+  sentBy: messageSender('sent_by').default('system').notNull(),
   sentAt: timestamp('sent_at', { withTimezone: true }).defaultNow().notNull(),
 });
 

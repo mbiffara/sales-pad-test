@@ -1,6 +1,7 @@
 import PgBoss from 'pg-boss';
 
 import { config } from '../config/env';
+import { registerJobs } from '../jobs';
 
 const boss = new PgBoss({
   connectionString: config.boss.connectionString,
@@ -15,6 +16,7 @@ let started = false;
 export const startBoss = async () => {
   if (!started) {
     await boss.start();
+    registerJobs(boss);
     started = true;
     console.log('[pg-boss] started');
   }
