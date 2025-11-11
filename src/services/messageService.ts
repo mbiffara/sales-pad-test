@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { asc, eq } from 'drizzle-orm';
 
 import { db } from '../db';
 import { Message, messages } from '../db/schema';
@@ -98,4 +98,12 @@ const insertMessage = async ({
     .returning();
 
   return message;
+};
+
+export const listMessagesByLeadId = async (leadId: number): Promise<Message[]> => {
+  return db
+    .select()
+    .from(messages)
+    .where(eq(messages.leadId, leadId))
+    .orderBy(asc(messages.sentAt));
 };

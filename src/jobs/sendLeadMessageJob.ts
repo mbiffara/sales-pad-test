@@ -10,6 +10,7 @@ export type SendLeadMessagePayload = {
   leadId: number;
   subject: string;
   body: string;
+  messageId?: number;
 };
 
 export const registerSendLeadMessageWorker = (boss: PgBoss) => {
@@ -22,7 +23,7 @@ export const registerSendLeadMessageWorker = (boss: PgBoss) => {
 };
 
 const handleJob = async (job: PgBoss.Job<SendLeadMessagePayload>) => {
-  const { leadId, subject, body } = job.data;
+  const { leadId, subject, body, messageId } = job.data;
 
   const lead = await getLeadById(leadId);
   if (!lead) {
@@ -37,12 +38,17 @@ const handleJob = async (job: PgBoss.Job<SendLeadMessagePayload>) => {
     return;
   }
 
-  const message = await createSystemMessage({
-    leadId,
-    subject,
-    body,
-    channel: 'email',
-  });
+  let finalMessageId = messageId;
+
+  if (!finalMessageId) {
+    const message = await createSystemMessage({
+      leadId,
+      subject,
+      body,
+      channel: 'email',
+    });
+    finalMessageId = message.id;
+  }
 
   await sendEmail({
     to: lead.email,
@@ -50,5 +56,5 @@ const handleJob = async (job: PgBoss.Job<SendLeadMessagePayload>) => {
     body,
   });
 
-  await markMessageSent(message.id);
+  await markMessageSent(finalMessageId);
 };

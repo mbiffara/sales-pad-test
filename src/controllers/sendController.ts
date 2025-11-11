@@ -45,6 +45,8 @@ export const postSend = async (req: Request, res: Response) => {
       body,
     });
 
+    console.log(`Enqueued sendLeadMessage job ${jobId} for lead ${lead.id}`);
+
     return res
       .status(202)
       .json({ message: 'Send job enqueued.', jobId, leadId: lead.id });

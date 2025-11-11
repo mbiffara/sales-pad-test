@@ -39,3 +39,4 @@ Simple Express + TypeScript API scaffold for Sales Pad.
 - `POST /api/v1/lead` – create a lead (`name` + at least one of `email` or `phoneNumber`).
 - `POST /api/v1/send` – enqueue a background job to email a lead (`leadId`, `subject`, `body`).
 - `POST /api/v1/reply` – enqueue a background job that records a lead-authored email reply (`email`, `body`, optional `subject`).
+- `POST /api/v1/ai/reply` – use the mock AI service to craft and send a response for a lead (`leadId`, optional `subject`).
