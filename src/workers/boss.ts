@@ -16,7 +16,7 @@ let started = false;
 export const startBoss = async () => {
   if (!started) {
     await boss.start();
-    registerJobs(boss);
+    await registerJobs(boss);
     started = true;
     console.log('[pg-boss] started');
   }
