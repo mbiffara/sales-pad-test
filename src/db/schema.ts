@@ -46,3 +46,34 @@ export const messages = pgTable('messages', {
 
 export type Message = typeof messages.$inferSelect;
 export type NewMessage = typeof messages.$inferInsert;
+
+export const jobType = pgEnum('job_type', [
+  'send_lead_message',
+  'lead_reply_message',
+  'ai_reply_message',
+]);
+
+export const jobStatus = pgEnum('job_status', [
+  'queued',
+  'processing',
+  'completed',
+  'failed',
+  'skipped',
+]);
+
+export const jobs = pgTable('jobs', {
+  id: serial('id').primaryKey(),
+  bossJobId: varchar('boss_job_id', { length: 128 }).notNull(),
+  leadId: integer('lead_id').references(() => leads.id, { onDelete: 'cascade' }),
+  messageId: integer('message_id').references(() => messages.id, {
+    onDelete: 'set null',
+  }),
+  type: jobType('type').notNull(),
+  status: jobStatus('status').default('queued').notNull(),
+  details: text('details'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export type Job = typeof jobs.$inferSelect;
+export type NewJob = typeof jobs.$inferInsert;

@@ -51,12 +51,15 @@ export const postAIReply = async (req: Request, res: Response) => {
       channel: 'email',
     });
 
-    const jobId = await enqueueSendLeadMessage({
-      leadId: lead.id,
-      subject,
-      body: aiResponse,
-      messageId: message.id,
-    });
+    const jobId = await enqueueSendLeadMessage(
+      {
+        leadId: lead.id,
+        subject,
+        body: aiResponse,
+        messageId: message.id,
+      },
+      { type: 'ai_reply_message' },
+    );
 
     return res.status(202).json({
       message: 'AI reply enqueued.',

@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 
 import { createLead, getLeadById, LeadConflictError } from '../services/leadService';
+import { listMessagesByLeadId } from '../services/messageService';
+import { listJobsByLeadId } from '../services/jobService';
 
 const sanitizeString = (value: unknown): string | undefined => {
   if (typeof value !== 'string') {
@@ -58,7 +60,16 @@ export const getLead = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Lead not found.' });
     }
 
-    return res.json({ lead });
+    const [messages, jobs] = await Promise.all([
+      listMessagesByLeadId(lead.id),
+      listJobsByLeadId(lead.id),
+    ]);
+
+    return res.json({
+      lead,
+      messages,
+      jobs,
+    });
   } catch (error) {
     console.error(`Failed to fetch lead ${id}`, error);
     return res.status(500).json({ message: 'Failed to fetch lead.' });
