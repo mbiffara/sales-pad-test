@@ -9,6 +9,8 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 
+export const leadStatus = pgEnum('lead_status', ['new', 'in_progress', 'won', 'lost']);
+
 export const leads = pgTable(
   'leads',
   {
@@ -16,6 +18,7 @@ export const leads = pgTable(
     name: varchar('name', { length: 255 }).notNull(),
     email: varchar('email', { length: 255 }),
     phoneNumber: varchar('phone_number', { length: 32 }),
+    status: leadStatus('status').default('new').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   },
   (table) => ({
@@ -46,6 +49,27 @@ export const messages = pgTable('messages', {
 
 export type Message = typeof messages.$inferSelect;
 export type NewMessage = typeof messages.$inferInsert;
+
+export const eventType = pgEnum('event_type', [
+  'lead_added',
+  'message_sent',
+  'reply_received',
+  'ai_reply_sent',
+  'lead_status_changed',
+]);
+
+export const events = pgTable('events', {
+  id: serial('id').primaryKey(),
+  leadId: integer('lead_id')
+    .notNull()
+    .references(() => leads.id, { onDelete: 'cascade' }),
+  type: eventType('type').notNull(),
+  data: text('data'),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+});
+
+export type Event = typeof events.$inferSelect;
+export type NewEvent = typeof events.$inferInsert;
 
 export const jobType = pgEnum('job_type', [
   'send_lead_message',

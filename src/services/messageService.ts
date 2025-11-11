@@ -2,6 +2,7 @@ import { asc, eq } from 'drizzle-orm';
 
 import { db } from '../db';
 import { Message, messages } from '../db/schema';
+import { recordEvent } from './eventService';
 
 export type CreateSystemMessageInput = {
   leadId: number;
@@ -16,7 +17,7 @@ export const createSystemMessage = async ({
   body,
   channel = 'email',
 }: CreateSystemMessageInput): Promise<Message> => {
-  return insertMessage({
+  const message = await insertMessage({
     leadId,
     subject,
     body,
@@ -25,6 +26,18 @@ export const createSystemMessage = async ({
     sentBy: 'system',
     sentAt: new Date(),
   });
+
+  await recordEvent({
+    leadId,
+    type: 'message_sent',
+    data: {
+      messageId: message.id,
+      subject,
+      channel,
+    },
+  });
+
+  return message;
 };
 
 export const markMessageSent = async (messageId: number): Promise<Message | undefined> => {
@@ -54,7 +67,7 @@ export const createLeadReplyMessage = async ({
   body,
   channel = 'email',
 }: CreateLeadReplyMessageInput): Promise<Message> => {
-  return insertMessage({
+  const message = await insertMessage({
     leadId,
     subject,
     body,
@@ -63,6 +76,18 @@ export const createLeadReplyMessage = async ({
     sentBy: 'lead',
     sentAt: new Date(),
   });
+
+  await recordEvent({
+    leadId,
+    type: 'reply_received',
+    data: {
+      messageId: message.id,
+      subject,
+      channel,
+    },
+  });
+
+  return message;
 };
 
 type InsertMessageArgs = {

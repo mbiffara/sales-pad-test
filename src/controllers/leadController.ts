@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { createLead, getLeadById, LeadConflictError } from '../services/leadService';
 import { listMessagesByLeadId } from '../services/messageService';
 import { listJobsByLeadId } from '../services/jobService';
+import { listEventsByLeadId } from '../services/eventService';
 
 const sanitizeString = (value: unknown): string | undefined => {
   if (typeof value !== 'string') {
@@ -60,15 +61,17 @@ export const getLead = async (req: Request, res: Response) => {
       return res.status(404).json({ message: 'Lead not found.' });
     }
 
-    const [messages, jobs] = await Promise.all([
+    const [messages, jobs, events] = await Promise.all([
       listMessagesByLeadId(lead.id),
       listJobsByLeadId(lead.id),
+      listEventsByLeadId(lead.id),
     ]);
 
     return res.json({
       lead,
       messages,
       jobs,
+      events,
     });
   } catch (error) {
     console.error(`Failed to fetch lead ${id}`, error);

@@ -3,6 +3,7 @@ import PgBoss from 'pg-boss';
 import { createLeadReplyMessage } from '../services/messageService';
 import { getLeadByEmail } from '../services/leadService';
 import { updateJobStatus } from '../services/jobService';
+import { recordEvent } from '../services/eventService';
 
 export const LEAD_REPLY_MESSAGE_JOB = 'lead-reply-message';
 
@@ -62,6 +63,15 @@ const handleJob = async (job: PgBoss.Job<LeadReplyJobPayload>) => {
     await updateJobStatus(job.id, 'completed', {
       messageId: message.id,
       leadId: lead.id,
+    });
+
+    await recordEvent({
+      leadId: lead.id,
+      type: 'reply_received',
+      data: {
+        messageId: message.id,
+        subject,
+      },
     });
   } catch (error) {
     console.error('[leadReplyJob] Failed to record reply', error);

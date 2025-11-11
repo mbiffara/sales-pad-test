@@ -4,6 +4,7 @@ import { createSystemMessage, markMessageSent } from '../services/messageService
 import { getLeadById } from '../services/leadService';
 import { sendEmail } from '../services/emailService';
 import { updateJobStatus } from '../services/jobService';
+import { recordEvent } from '../services/eventService';
 
 export const SEND_LEAD_MESSAGE_JOB = 'send-lead-message';
 
@@ -75,6 +76,13 @@ const handleJob = async (job: PgBoss.Job<SendLeadMessagePayload>) => {
     }
 
     await updateJobStatus(job.id, 'completed', { messageId: finalMessageId });
+    if (finalMessageId) {
+      await recordEvent({
+        leadId: lead.id,
+        type: 'message_sent',
+        data: { messageId: finalMessageId, subject },
+      });
+    }
   } catch (error) {
     console.error(`[sendLeadMessageJob] Failed for job ${job.id}`, error);
     await updateJobStatus(job.id, 'failed', {

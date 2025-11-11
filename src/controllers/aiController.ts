@@ -7,6 +7,7 @@ import {
   createSystemMessage,
   listMessagesByLeadId,
 } from '../services/messageService';
+import { recordEvent } from '../services/eventService';
 
 const cleanString = (value: unknown): string | undefined => {
   if (typeof value !== 'string') {
@@ -60,6 +61,15 @@ export const postAIReply = async (req: Request, res: Response) => {
       },
       { type: 'ai_reply_message' },
     );
+
+    await recordEvent({
+      leadId: lead.id,
+      type: 'ai_reply_sent',
+      data: {
+        messageId: message.id,
+        subject,
+      },
+    });
 
     return res.status(202).json({
       message: 'AI reply enqueued.',

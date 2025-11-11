@@ -2,6 +2,7 @@ import { eq } from 'drizzle-orm';
 
 import { db } from '../db';
 import { Lead, leads } from '../db/schema';
+import { recordEvent } from './eventService';
 
 export type CreateLeadInput = {
   name: string;
@@ -57,6 +58,15 @@ export const createLead = async ({
       phoneNumber: phoneNumber ?? null,
     })
     .returning();
+
+  await recordEvent({
+    leadId: lead.id,
+    type: 'lead_added',
+    data: {
+      email: lead.email,
+      phoneNumber: lead.phoneNumber,
+    },
+  });
 
   return lead;
 };
